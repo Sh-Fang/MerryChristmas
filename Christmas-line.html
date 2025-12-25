@@ -814,9 +814,6 @@ function drawStars() {
       "To：企鹅宝宝",
       "Merry Christmas",
       "圣诞节快乐呀~",
-      "每天都要开心~",
-      "每天吃饱饱~",
-      "然后长壮壮~",
     ];
     
     function init() {
@@ -837,12 +834,45 @@ function drawStars() {
     }
     let init_flag = false;
       // music
-      let music_url = "http://music.163.com/song/media/outer/url?id=1892513656.mp3";
+      let music_url = "./music.mp3";
       let _music = new Audio(music_url);
-      window.onclick = function() {
+      _music.volume = 0; // 初始音量为0
+      _music.loop = true; // 循环播放
+      
+      console.log("音乐文件路径:", music_url);
+      
+      // 音乐渐入函数
+      function fadeInMusic(duration = 2000) {
+        let volume = 0;
+        let step = 0.05;
+        let interval = duration / (1 / step);
+        
+        console.log("开始音乐渐入效果");
+        let fadeIn = setInterval(() => {
+          if (volume < 1) {
+            volume += step;
+            _music.volume = Math.min(volume, 1);
+          } else {
+            clearInterval(fadeIn);
+            console.log("音乐渐入完成");
+          }
+        }, interval);
+      }
+      
+      // 进入主界面的函数
+      function enterMainScene() {
         if(init_flag) return;
         init_flag = true;
-        _music.play();
+        console.log("进入主界面");
+        
+        // 进入主界面时开始播放音乐
+        _music.play().then(() => {
+          console.log("音乐播放成功！");
+          fadeInMusic(2000); // 2秒渐入
+        }).catch(err => {
+          console.error("音乐播放失败:", err);
+        });
+        
         init();
         let mask = document.getElementById("mask");
         mask.remove();
@@ -852,6 +882,17 @@ function drawStars() {
         mainTl.add(starTl, 0);
         gsap.globalTimeline.timeScale(1.5); //  圣诞树开始绘画时小光点动画的绘画速率，越大越快
         drawStars();
+      }
+      
+      // 点击进入主界面
+      window.onclick = function(e) {
+        console.log("检测到点击事件");
+        enterMainScene();
+      }
+      
+      // 页面加载完成后的处理
+      window.onload = function() {
+        console.log("页面加载完成，等待用户点击");
       }
   
   </script>
